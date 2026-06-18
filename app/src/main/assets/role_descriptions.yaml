@@ -1,0 +1,49 @@
+roles:
+  - id: straight_high_priestess
+    name: Straight High Priestess
+    description: Knows which players belong to the REVERSED side, except roles hidden from arcane sight. Appears as an Oracle.
+  - id: straight_hierophant
+    name: Straight Hierophant
+    description: Sees the players who appear as Oracle figures during the initial information phase.
+  - id: straight_face_card_1
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: straight_face_card_2
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: straight_face_card_3
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: straight_face_card_4
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: straight_face_card_5
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: straight_face_card_6
+    name: Straight Face Card
+    description: A STRAIGHT player with no special ability.
+  - id: reversed_death
+    name: Reversed Death
+    description: A REVERSED player who can attempt the final elimination when STRAIGHT would otherwise win.
+  - id: reversed_high_priestess
+    name: Reversed High Priestess
+    description: A REVERSED player who appears as an Oracle.
+  - id: reversed_tower
+    name: Reversed Tower
+    description: A REVERSED player hidden from arcane sight.
+  - id: the_hermit
+    name: The Hermit
+    description: A REVERSED player isolated from the normal REVERSED visibility group.
+  - id: reversed_face_card_1
+    name: Reversed Face Card
+    description: A REVERSED player with no special ability.
+  - id: reversed_face_card_2
+    name: Reversed Face Card
+    description: A REVERSED player with no special ability.
+  - id: reversed_face_card_3
+    name: Reversed Face Card
+    description: A REVERSED player with no special ability.
+  - id: reversed_face_card_4
+    name: Reversed Face Card
+    description: A REVERSED player with no special ability.

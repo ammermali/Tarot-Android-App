@@ -1,0 +1,16 @@
+package eu.mermali.tarot.domain.model
+
+enum class GamePhase {
+    PLAYER_SETUP,
+    CARD_SETUP,
+    CARD_ASSIGNMENT,
+    CARD_REVEAL,
+    INITIAL_INFORMATION,
+    TEAM_PROPOSAL,
+    TEAM_VOTING,
+    TEAM_VOTE_RESULT,
+    MISSION_VOTING,
+    MISSION_RESULT,
+    FINAL_ELIMINATION,
+    GAME_OVER
+}

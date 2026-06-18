@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Tarot.Launch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/main_menu_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_transparent</item>
+        <item name="postSplashScreenTheme">@style/Theme.Tarot</item>
+    </style>
+
+    <style name="Theme.Tarot" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/main_menu_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:statusBarColor">@color/main_menu_background</item>
+        <item name="android:navigationBarColor">@color/main_menu_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+</resources>
