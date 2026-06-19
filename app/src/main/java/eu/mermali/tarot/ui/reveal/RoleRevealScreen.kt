@@ -247,6 +247,7 @@ private fun VisibilityReason.label(): String {
         VisibilityReason.REVERSED_NETWORK -> "Reversed players"
         VisibilityReason.ARCANE_SIGHT -> "Reversed players"
         VisibilityReason.ORACLE_SIGHT -> "Oracle players"
+        VisibilityReason.FINAL_ELIMINATOR_SIGHT -> "Final eliminator"
     }
 }
 

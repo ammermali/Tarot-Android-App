@@ -18,6 +18,8 @@ data class GameState(
     val proposedTeam: List<Player> = emptyList(),
     val teamVotes: Map<Int, TeamVote> = emptyMap(),
     val missionVotes: List<MissionVote> = emptyList(),
+    val devilGuessTargetPlayerId: Int? = null,
+    val activeFinalEliminatorPlayerId: Int? = null,
     val winner: Winner? = null,
     val finalEliminationTargetPlayerId: Int? = null,
     val currentRevealPosition: Int = 0,

@@ -32,11 +32,17 @@ import eu.mermali.tarot.game.gamestate.GameState
 
 @Composable
 fun PostGameEliminationScreen(gameState: GameState, onTargetSelected: (eliminatorPlayerId: Int, targetPlayerId: Int) -> Unit, onMainMenu: () -> Unit) {
-    val eliminator = gameState.players.firstOrNull { player ->
-        player.card?.id == ReversedDeathCardId || player.card?.canAttemptFinalElimination == true || player.card?.hasAbility(TarotAbility.FinalEliminator) == true
-    }
+    val eliminator = gameState.activeFinalEliminatorPlayerId?.let { id -> gameState.players.firstOrNull{it.id == id}}
+        ?: gameState.players.firstOrNull {player ->
+            player.card?.id == ReversedDeathCardId || player.card?.canAttemptFinalElimination == true || player.card?.hasAbility(TarotAbility.FinalEliminator) == true
+        }
     val targetExists = gameState.players.any { player ->
         player.card?.id == StraightHighPriestessCardId || player.card?.isFinalEliminationTarget == true || player.card?.hasAbility(TarotAbility.SeesReversed) == true
+    }
+    val eliminatorLabel = if (eliminator?.card?.id == "straight_devil"){
+        "STRAIGHT DEVIL"
+    } else {
+        "REVERSED DEATH"
     }
 
     if (eliminator == null || !targetExists) {
@@ -71,7 +77,7 @@ fun PostGameEliminationScreen(gameState: GameState, onTargetSelected: (eliminato
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "REVERSED DEATH",
+                        text = eliminatorLabel,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = ReversedWinColor

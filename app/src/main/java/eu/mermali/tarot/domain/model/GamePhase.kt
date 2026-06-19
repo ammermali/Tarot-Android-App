@@ -11,6 +11,7 @@ enum class GamePhase {
     TEAM_VOTE_RESULT,
     MISSION_VOTING,
     MISSION_RESULT,
+    DEVIL_GUESS,
     FINAL_ELIMINATION,
     GAME_OVER
 }

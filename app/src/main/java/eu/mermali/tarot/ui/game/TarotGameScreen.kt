@@ -155,6 +155,7 @@ fun TarotGameScreen() {
                     showMissionVote = false
                     selectedTeamIds = emptySet()
                 }
+                GamePhase.DEVIL_GUESS -> WaitingPhasePanel(gameState.phase)
                 GamePhase.FINAL_ELIMINATION -> FinalEliminationPanel(gameState, useCases) { gameState = it }
                 GamePhase.GAME_OVER -> GameOverPanel(gameState, useCases)
             }
@@ -524,12 +525,15 @@ private fun TarotAbility.label(): String = when (this) {
     TarotAbility.HiddenFromSight -> "hidden from sight"
     TarotAbility.IsolatedReversed -> "isolated reversed"
     TarotAbility.CanCastMagic -> "can cast magic"
+    TarotAbility.SeesFinalEliminator -> "can see the final eliminator"
+    TarotAbility.AppearsReversed -> "appears reversed"
 }
 
 private fun VisibilityReason.label(): String = when (this) {
     VisibilityReason.REVERSED_NETWORK -> "Reversed network"
     VisibilityReason.ARCANE_SIGHT -> "Arcane sight"
     VisibilityReason.ORACLE_SIGHT -> "Oracle sight"
+    VisibilityReason.FINAL_ELIMINATOR_SIGHT -> "Sight of Final Eliminator"
 }
 
 private fun CardDirection.color(): Color = when (this) {

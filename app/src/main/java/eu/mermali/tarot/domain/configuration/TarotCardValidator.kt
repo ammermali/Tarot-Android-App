@@ -33,6 +33,15 @@ class TarotCardValidator {
             if (card.hasAbility(TarotAbility.IsolatedReversed) && card.direction != CardDirection.REVERSED) {
                 errors.add("${card.displayName} can be isolated only when REVERSED.")
             }
+            if (card.hasAbility(TarotAbility.CanCastMagic) && card.id != "straight_magician" && card.id != "reversed_magician"){
+                errors.add("${card.displayName} can cast MAGIC only if it is a magician.")
+            }
+            if (card.hasAbility(TarotAbility.AppearsReversed) && card.direction != CardDirection.STRAIGHT){
+                errors.add("${card.displayName} can appear REVERSED only when STRAIGHT.")
+            }
+            if(card.hasAbility(TarotAbility.SeesFinalEliminator) && card.direction != CardDirection.STRAIGHT){
+                errors.add("${card.displayName} can see Reversed Death only when STRAIGHT.")
+            }
         }
         val finalTargets = cards.count { it.isFinalEliminationTarget }
         if (finalTargets > 1) { errors.add("Only one final elimination target is supported.") }

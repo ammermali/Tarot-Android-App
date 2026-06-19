@@ -23,6 +23,7 @@ import eu.mermali.tarot.game.usecases.ResolveMission
 import eu.mermali.tarot.game.usecases.ResolveTeamVote
 import eu.mermali.tarot.game.usecases.SubmitMissionVote
 import eu.mermali.tarot.game.usecases.SubmitTeamVote
+import eu.mermali.tarot.game.usecases.ResolveDevilGuess
 import eu.mermali.tarot.ui.game.GameOverScreen
 import eu.mermali.tarot.ui.game.GameStatusScreen
 import eu.mermali.tarot.ui.game.MissionReadingRevealScreen
@@ -32,6 +33,7 @@ import eu.mermali.tarot.ui.game.PostGameEliminationScreen
 import eu.mermali.tarot.ui.game.TeamCreationScreen
 import eu.mermali.tarot.ui.game.TeamVoteResultScreen
 import eu.mermali.tarot.ui.game.TeamVoteScreen
+import eu.mermali.tarot.ui.game.PostGameDevilGuessScreen
 import eu.mermali.tarot.ui.logs.GameLogsScreen
 import eu.mermali.tarot.ui.main.MainMenuScreen
 import eu.mermali.tarot.ui.reveal.RoleRevealScreen
@@ -48,6 +50,7 @@ private enum class AppScreen {
     MISSION_VOTING,
     MISSION_READING_REVEAL,
     MISSION_READING_RESULT,
+    DEVIL_GUESS,
     FINAL_ELIMINATION,
     GAME_OVER,
     LOGS
@@ -66,6 +69,7 @@ fun TarotApp() {
     val submitMissionVote = remember { SubmitMissionVote() }
     val resolveMission = remember { ResolveMission() }
     val resolveFinalElimination = remember { ResolveFinalElimination() }
+    val resolveDevilGuess = remember { ResolveDevilGuess() }
 
     fun returnToMainMenu(saveCompletedGame: Boolean = false) {
         if (saveCompletedGame) {
@@ -243,11 +247,32 @@ fun TarotApp() {
                             val updatedState = resolveMission(gameState)
                             startedGameState = updatedState
                             currentScreen = when (updatedState.phase) {
+                                GamePhase.DEVIL_GUESS -> AppScreen.DEVIL_GUESS
                                 GamePhase.FINAL_ELIMINATION -> AppScreen.FINAL_ELIMINATION
                                 GamePhase.GAME_OVER -> AppScreen.GAME_OVER
                                 else -> AppScreen.GAME_STATUS
                             }
                         }
+                    )
+                }
+            }
+
+            AppScreen.DEVIL_GUESS -> {
+                val gameState = startedGameState
+                if (gameState == null) {
+                    MainMenuScreen(
+                        onPlay = {currentScreen = AppScreen.SETUP},
+                        onOpenLogs = {currentScreen = AppScreen.LOGS}
+                    )
+                } else {
+                    PostGameDevilGuessScreen(
+                        gameState = gameState,
+                        onTargetSelected = { deathPlayerId, targetPlayerId ->
+                            val updateState = resolveDevilGuess(gameState, deathPlayerId, targetPlayerId)
+                            startedGameState = updateState
+                            currentScreen = AppScreen.FINAL_ELIMINATION
+                        },
+                        onSkipToFinalElimination = { currentScreen = AppScreen.FINAL_ELIMINATION }
                     )
                 }
             }

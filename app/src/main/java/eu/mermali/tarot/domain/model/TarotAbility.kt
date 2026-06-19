@@ -8,4 +8,6 @@ sealed class TarotAbility {
     object HiddenFromSight : TarotAbility()
     object IsolatedReversed : TarotAbility()
     object CanCastMagic : TarotAbility()
+    object AppearsReversed : TarotAbility()
+    object SeesFinalEliminator : TarotAbility()
 }

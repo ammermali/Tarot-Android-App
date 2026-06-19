@@ -15,6 +15,7 @@ class FinalEliminationRule {
             ?: throw IllegalArgumentException("Unknown eliminator player id: $eliminatorPlayerId")
         val target = state.players.firstOrNull { it.id == targetPlayerId }
             ?: throw IllegalArgumentException("Unknown target player id: $targetPlayerId")
+        val isActiveOverride = state.activeFinalEliminatorPlayerId == eliminatorPlayerId
         require(canAttemptFinalElimination(eliminator)) { "This player cannot attempt final elimination." }
         val correctTarget = target.card?.isFinalEliminationTarget == true ||
             target.card?.hasAbility(TarotAbility.SeesReversed) == true

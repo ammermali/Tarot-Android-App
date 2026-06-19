@@ -17,7 +17,13 @@ class VictoryRule {
     fun applyAfterMission(state: GameState): GameState {
         val winner = evaluate(state)
         if (winner != null) {return state.copy(winner = winner, phase = GamePhase.GAME_OVER) }
-        if (state.straightScore >= MISSIONS_TO_WIN && canRunFinalElimination(state)) { return state.copy(phase = GamePhase.FINAL_ELIMINATION) }
+        if (state.straightScore >= MISSIONS_TO_WIN && canRunFinalElimination(state)) {
+            return if (hasStraightDevil(state) && hasReversedDeath(state)){
+                state.copy(phase = GamePhase.DEVIL_GUESS)
+            } else {
+                state.copy(phase = GamePhase.FINAL_ELIMINATION)
+            }
+        }
         return state.copy(
             currentMissionIndex = state.currentMissionIndex + 1,
             currentReaderPosition = state.currentReaderPosition + 1,
@@ -36,6 +42,9 @@ class VictoryRule {
 
     private fun canRunFinalElimination(state: GameState): Boolean =
         hasFinalEliminationTarget(state) && hasFinalEliminator(state)
+
+    private fun hasStraightDevil(state: GameState): Boolean = state.players.any { it.card?.id == "straight_devil" }
+    private fun hasReversedDeath(state: GameState): Boolean = state.players.any { it.card?.id == "reversed_death" }
 
     companion object {
         const val MISSIONS_TO_WIN = 3

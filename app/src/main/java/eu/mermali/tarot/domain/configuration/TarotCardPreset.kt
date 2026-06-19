@@ -30,6 +30,12 @@ class TarotCardPreset {
             abilities = setOf(TarotAbility.CanCastMagic)
         ),
         TarotCard(
+            id = "straight_devil",
+            displayName = "Straight Devil",
+            direction = CardDirection.STRAIGHT,
+            abilities = setOf(TarotAbility.AppearsReversed, TarotAbility.SeesFinalEliminator)
+        ),
+        TarotCard(
             id = "reversed_death",
             displayName = "Reversed Death",
             direction = CardDirection.REVERSED,
