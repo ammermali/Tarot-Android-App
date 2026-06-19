@@ -12,8 +12,9 @@ class MissionResultRule {
         require(votes.size == mission.requiredPlayerCount) { "Mission ${mission.index} requires ${mission.requiredPlayerCount} mission votes." }
         val reversedVotes = votes.count { it == MissionVote.REVERSED }
         val straightVotes = votes.count { it == MissionVote.STRAIGHT }
-        val result = if (reversedVotes >= mission.reversedVotesRequired) { MissionResult.REVERSED }
-        else { MissionResult.STRAIGHT }
+        val magicVotes = votes.count { it == MissionVote.MAGIC }
+        val baseresult = if (reversedVotes >= mission.reversedVotesRequired) { MissionResult.REVERSED } else { MissionResult.STRAIGHT }
+        val result = if (magicVotes % 2 == 1) { baseresult.invert() } else { baseresult }
         return mission.copy(result = result, straightVoteCount = straightVotes, reversedVoteCount = reversedVotes)
     }
 
@@ -34,6 +35,14 @@ class MissionResultRule {
         }
 
         return copy(artKey = artPool.random(random))
+    }
+
+    private fun MissionResult.invert() : MissionResult{
+        return when(this){
+            MissionResult.STRAIGHT -> MissionResult.REVERSED
+            MissionResult.REVERSED -> MissionResult.STRAIGHT
+            MissionResult.PENDING -> MissionResult.PENDING
+        }
     }
 
     private companion object {

@@ -1,3 +1,3 @@
 package eu.mermali.tarot.domain.model
 
-enum class MissionVote { STRAIGHT, REVERSED }
+enum class MissionVote { STRAIGHT, REVERSED, MAGIC }

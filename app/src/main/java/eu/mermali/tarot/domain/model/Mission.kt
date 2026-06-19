@@ -8,6 +8,7 @@ data class Mission(
     val result: MissionResult = MissionResult.PENDING,
     val straightVoteCount: Int = 0,
     val reversedVoteCount: Int = 0,
+    val magicVoteCount: Int = 0,
     val artKey: String? = null
 ) {
     val isResolved: Boolean get() = result != MissionResult.PENDING

@@ -523,6 +523,7 @@ private fun TarotAbility.label(): String = when (this) {
     TarotAbility.AppearsAsOracle -> "appears as oracle"
     TarotAbility.HiddenFromSight -> "hidden from sight"
     TarotAbility.IsolatedReversed -> "isolated reversed"
+    TarotAbility.CanCastMagic -> "can cast magic"
 }
 
 private fun VisibilityReason.label(): String = when (this) {

@@ -32,8 +32,8 @@ roles:
   - id: reversed_tower
     name: Reversed Tower
     description: A REVERSED player hidden from arcane sight.
-  - id: the_hermit
-    name: The Hermit
+  - id: reversed_devil
+    name: Reversed Devil
     description: A REVERSED player isolated from the normal REVERSED visibility group.
   - id: reversed_face_card_1
     name: Reversed Face Card
@@ -47,3 +47,12 @@ roles:
   - id: reversed_face_card_4
     name: Reversed Face Card
     description: A REVERSED player with no special ability.
+  - id: straight_magician
+    name: Straight Magician
+    description: A STRAIGHT player that can cast magic. Magic will invert the result of every quest it's casted on.
+  - id: reversed_magician
+    name: Reversed Magician
+    description: A REVERSED player that can cast magic. Magic will invert the result of every quest it's casted on. It can not play REVERSE.
+  - id: straight_devil
+    name: Straight Devil
+    description: A STRAIGHT player that is seen as REVERSED. If the STRAIGHT players win, the REVERSED DEVIL can guess this card and convert the STRAIGHT DEVIL into a REVERSED player.

@@ -7,4 +7,5 @@ sealed class TarotAbility {
     object AppearsAsOracle : TarotAbility()
     object HiddenFromSight : TarotAbility()
     object IsolatedReversed : TarotAbility()
+    object CanCastMagic : TarotAbility()
 }

@@ -3,11 +3,16 @@ import eu.mermali.tarot.domain.model.CardDirection
 import eu.mermali.tarot.domain.model.GamePhase
 import eu.mermali.tarot.domain.model.MissionVote
 import eu.mermali.tarot.domain.model.Player
+import eu.mermali.tarot.domain.model.TarotAbility
 import eu.mermali.tarot.game.gamestate.GameState
 
 class MissionVotingRule {
     fun canCastMissionVote(player: Player, vote: MissionVote): Boolean {
         val card = player.card ?: return false
+
+        if (card.hasAbility(TarotAbility.CanCastMagic)) {
+            return vote == MissionVote.STRAIGHT || vote == MissionVote.MAGIC
+        }
         return when (card.direction) {
             CardDirection.STRAIGHT -> vote == MissionVote.STRAIGHT
             CardDirection.REVERSED -> true

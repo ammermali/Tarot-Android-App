@@ -24,6 +24,12 @@ class TarotCardPreset {
             count = 6
         ).toTypedArray(),
         TarotCard(
+            id = "straight_magician",
+            displayName = "Straight Magician",
+            direction = CardDirection.STRAIGHT,
+            abilities = setOf(TarotAbility.CanCastMagic)
+        ),
+        TarotCard(
             id = "reversed_death",
             displayName = "Reversed Death",
             direction = CardDirection.REVERSED,
@@ -35,6 +41,12 @@ class TarotCardPreset {
             direction = CardDirection.REVERSED,
             abilities = setOf(TarotAbility.AppearsAsOracle)
         ),
+        *faceCards(
+            idPrefix = "reversed_face_card",
+            displayName = "Reversed Face Card",
+            direction = CardDirection.REVERSED,
+            count = 4
+        ).toTypedArray(),
         TarotCard(
             id = "reversed_tower",
             displayName = "Reversed Tower",
@@ -42,17 +54,17 @@ class TarotCardPreset {
             abilities = setOf(TarotAbility.HiddenFromSight)
         ),
         TarotCard(
-            id = "the_hermit",
-            displayName = "The Hermit",
+            id = "reversed_devil",
+            displayName = "Reversed Devil",
             direction = CardDirection.REVERSED,
             abilities = setOf(TarotAbility.IsolatedReversed)
         ),
-        *faceCards(
-            idPrefix = "reversed_face_card",
-            displayName = "Reversed Face Card",
+        TarotCard(
+            id = "reversed_magician",
+            displayName = "Reversed Magician",
             direction = CardDirection.REVERSED,
-            count = 4
-        ).toTypedArray()
+            abilities = setOf(TarotAbility.CanCastMagic)
+        )
     )
 
     fun defaultSelection(playerCount: Int): List<TarotCard> {

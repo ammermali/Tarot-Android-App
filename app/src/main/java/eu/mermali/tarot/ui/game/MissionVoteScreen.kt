@@ -240,6 +240,7 @@ private fun MissionVoteResultRow(index: Int, vote: MissionVote) {
     val voteColor = when (vote) {
         MissionVote.STRAIGHT -> StraightResultColor
         MissionVote.REVERSED -> ReversedResultColor
+        MissionVote.MAGIC -> MagicResultColor
     }
 
     Surface(
@@ -267,8 +268,9 @@ private fun MissionVoteResultRow(index: Int, vote: MissionVote) {
 
 private fun missionVoteOptions(): List<MissionVoteOption> {
     return listOf(
-        MissionVoteOption(vote = MissionVote.STRAIGHT, label = "STRAIGHT", color = StraightResultColor ),
-        MissionVoteOption(vote = MissionVote.REVERSED, label = "REVERSED", color = ReversedResultColor)
+        MissionVoteOption(vote = MissionVote.STRAIGHT, label = "STRAIGHT", color = StraightResultColor),
+        MissionVoteOption(vote = MissionVote.REVERSED, label = "REVERSED", color = ReversedResultColor),
+        MissionVoteOption(vote = MissionVote.MAGIC, label = "MAGIC", color = MagicResultColor)
     )
 }
 
@@ -278,3 +280,4 @@ private fun Player.displayName(): String {
 
 private val StraightResultColor = Color(0xFF1565C0)
 private val ReversedResultColor = Color(0xFFC62828)
+private val MagicResultColor = Color(0xFFC31BDE)
