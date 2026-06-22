@@ -1,3 +1,7 @@
+/**
+ * DEPRECATED
+ */
+
 package eu.mermali.tarot.ui.game
 
 import androidx.compose.foundation.background
@@ -527,6 +531,7 @@ private fun TarotAbility.label(): String = when (this) {
     TarotAbility.CanCastMagic -> "can cast magic"
     TarotAbility.SeesFinalEliminator -> "can see the final eliminator"
     TarotAbility.AppearsReversed -> "appears reversed"
+    else -> "evilsoc"
 }
 
 private fun VisibilityReason.label(): String = when (this) {

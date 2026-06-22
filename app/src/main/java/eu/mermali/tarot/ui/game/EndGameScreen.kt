@@ -29,6 +29,7 @@ import eu.mermali.tarot.domain.model.CardDirection
 import eu.mermali.tarot.domain.model.Player
 import eu.mermali.tarot.domain.model.TarotAbility
 import eu.mermali.tarot.game.gamestate.GameState
+import eu.mermali.tarot.game.gamestate.VictoryReason
 
 @Composable
 fun PostGameEliminationScreen(gameState: GameState, onTargetSelected: (eliminatorPlayerId: Int, targetPlayerId: Int) -> Unit, onMainMenu: () -> Unit) {
@@ -114,18 +115,33 @@ fun PostGameEliminationScreen(gameState: GameState, onTargetSelected: (eliminato
 @Composable
 fun GameOverScreen(gameState: GameState, onMainMenu: () -> Unit) {
     val winnerSide = gameState.winner?.side
-    val title = when (winnerSide) {
-        CardDirection.REVERSED -> "REVERSED WIN"
-        CardDirection.STRAIGHT -> "STRAIGHT WIN"
-        null -> "GAME OVER"
+    val title = when (gameState.winner?.reason) {
+        VictoryReason.HERMIT_STRAIGHT_TOKEN_WIN -> "STRAIGHT HERMIT WIN"
+        VictoryReason.HERMIT_REVERSED_TOKEN_WIN -> "REVERSED HERMIT WIN"
+        else -> when(winnerSide){
+            CardDirection.REVERSED -> "REVERSED WIN"
+            CardDirection.STRAIGHT -> "STRAIGHT WIN"
+            null -> "GAME OVER"
+        }
     }
     val titleColor = when (winnerSide) {
         CardDirection.REVERSED -> ReversedWinColor
         CardDirection.STRAIGHT -> StraightWinColor
         null -> MaterialTheme.colorScheme.onSurface
     }
-    val players = winnerSide?.let { gameState.players.playersFor(it) }.orEmpty()
-    val reason = gameState.winner?.reason?.name?.replace('_', ' ')
+    val winner = gameState.winner
+    val hermitWinnerPlayer = when(winner?.reason){
+        VictoryReason.HERMIT_STRAIGHT_TOKEN_WIN -> gameState.players.firstOrNull { it.card?.hasAbility(TarotAbility.HermitStraight) == true}
+        VictoryReason.HERMIT_REVERSED_TOKEN_WIN -> gameState.players.firstOrNull { it.card?.hasAbility(TarotAbility.HermitReversed) == true}
+        else -> null
+    }
+    val players = if(hermitWinnerPlayer != null){ listOf(hermitWinnerPlayer) }
+    else{ winnerSide?.let { gameState.players.playersFor(it)}.orEmpty() }
+    val reason = when(winner?.reason){
+        VictoryReason.HERMIT_STRAIGHT_TOKEN_WIN -> "Straight Hermit wins alone."
+        VictoryReason.HERMIT_REVERSED_TOKEN_WIN -> "Reversed Hermit wins alone."
+        else -> winner?.reason?.name?.replace('_', ' ')
+    }
 
     WinScreen(
         title = title,

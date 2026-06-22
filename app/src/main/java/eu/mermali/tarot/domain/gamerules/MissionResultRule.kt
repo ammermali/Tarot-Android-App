@@ -4,18 +4,24 @@ import eu.mermali.tarot.domain.model.GamePhase
 import eu.mermali.tarot.domain.model.Mission
 import eu.mermali.tarot.domain.model.MissionResult
 import eu.mermali.tarot.domain.model.MissionVote
+import eu.mermali.tarot.domain.model.MissionVoteCast
+import eu.mermali.tarot.domain.model.baseVote
+import eu.mermali.tarot.domain.model.emitToken
 import eu.mermali.tarot.game.gamestate.GameState
 import kotlin.random.Random
 
 class MissionResultRule {
-    fun resolve(mission: Mission, votes: List<MissionVote>): Mission {
+    fun resolve(mission: Mission, votes: List<MissionVoteCast>): Mission {
         require(votes.size == mission.requiredPlayerCount) { "Mission ${mission.index} requires ${mission.requiredPlayerCount} mission votes." }
-        val reversedVotes = votes.count { it == MissionVote.REVERSED }
-        val straightVotes = votes.count { it == MissionVote.STRAIGHT }
-        val magicVotes = votes.count { it == MissionVote.MAGIC }
+        val rawVotes = votes.map { it.vote }
+        val baseVotes = rawVotes.map { it.baseVote() }
+        val reversedVotes = baseVotes.count { it == MissionVote.REVERSED }
+        val straightVotes = baseVotes.count { it == MissionVote.STRAIGHT }
+        val magicVotes = baseVotes.count { it == MissionVote.MAGIC }
+        val tokens = rawVotes.mapNotNull { it.emitToken() }.toSet()
         val baseresult = if (reversedVotes >= mission.reversedVotesRequired) { MissionResult.REVERSED } else { MissionResult.STRAIGHT }
         val result = if (magicVotes % 2 == 1) { baseresult.invert() } else { baseresult }
-        return mission.copy(result = result, straightVoteCount = straightVotes, reversedVoteCount = reversedVotes)
+        return mission.copy(result = result, straightVoteCount = straightVotes, reversedVoteCount = reversedVotes, tokens = tokens)
     }
 
     fun resolveCurrentMission(state: GameState): GameState {

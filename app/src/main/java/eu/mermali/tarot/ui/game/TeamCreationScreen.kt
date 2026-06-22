@@ -32,13 +32,15 @@ import eu.mermali.tarot.domain.model.Player
 import eu.mermali.tarot.game.gamestate.GameState
 
 @Composable
-fun TeamCreationScreen(gameState: GameState, onBack: () -> Unit, onConfirmTeam: (List<Int>) -> Unit) {
+fun TeamCreationScreen(gameState: GameState, onBack: () -> Unit, onConfirmTeam: (List<Int>, Int?) -> Unit) {
     val players = remember(gameState.players) { gameState.players.sortedBy { it.position } }
     val mission = gameState.currentMission
     val requiredPlayers = mission?.requiredPlayerCount ?: 0
     var selectedPlayerIds by remember(gameState.currentMissionIndex, gameState.proposedTeam) { mutableStateOf(gameState.proposedTeam.map { it.id }.toSet()) }
     val selectedCount = selectedPlayerIds.size
     val canConfirm = requiredPlayers > 0 && selectedCount == requiredPlayers
+    val watchTokenAllowed = mission != null && (gameState.players.size !in 5..6 || mission.index >= 3)
+    var selectedWatchTokenPlayerId by remember(gameState.currentMissionIndex, gameState.proposedTeam) { mutableStateOf(gameState.currentMission?.watchTokenPlayerId)}
 
     Scaffold(topBar = { TeamCreationTopBar(onBack = onBack) })
     { innerPadding ->
@@ -81,13 +83,34 @@ fun TeamCreationScreen(gameState: GameState, onBack: () -> Unit, onConfirmTeam: 
                             player = player,
                             selected = selected,
                             canAdd = selected || selectedCount < requiredPlayers,
-                            onToggle = { selectedPlayerIds = if (selected) { selectedPlayerIds - player.id }  else { selectedPlayerIds + player.id } }
+                            watchTokenAllowed = watchTokenAllowed,
+                            watchSelected = selectedWatchTokenPlayerId == player.id,
+                            onToggleWatch = {
+                                selectedWatchTokenPlayerId = if(selectedWatchTokenPlayerId == player.id) null else player.id
+                            },
+                            onToggle = {
+                                selectedPlayerIds =
+                                    if(selected) {
+                                        if (selectedWatchTokenPlayerId == player.id) {
+                                            selectedWatchTokenPlayerId = null
+                                        }
+                                        selectedPlayerIds - player.id
+                                    } else {
+                                        selectedPlayerIds + player.id
+                                    }
+                            }
                         )
                     }
                 }
             }
 
-            Button(onClick = { onConfirmTeam(selectedPlayerIds.toList()) }, enabled = canConfirm, modifier = Modifier.fillMaxWidth()) { Text("Confirm team") }
+            Button(
+                onClick = {
+                    onConfirmTeam(selectedPlayerIds.toList(), selectedWatchTokenPlayerId)
+                          },
+                enabled = canConfirm,
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Confirm team") }
         }
     }
 }
@@ -103,7 +126,7 @@ private fun TeamCreationTopBar(onBack: () -> Unit) {
 }
 
 @Composable
-private fun PlayerSelectionRow(player: Player, selected: Boolean, canAdd: Boolean, onToggle: () -> Unit) {
+private fun PlayerSelectionRow(player: Player, selected: Boolean, canAdd: Boolean, watchTokenAllowed: Boolean, watchSelected: Boolean, onToggleWatch: () -> Unit, onToggle: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         shape = RoundedCornerShape(8.dp),
@@ -126,7 +149,8 @@ private fun PlayerSelectionRow(player: Player, selected: Boolean, canAdd: Boolea
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            if (selected) { OutlinedButton(onClick = onToggle) { Text("Remove") } }
+            if (selected && watchTokenAllowed) { OutlinedButton(onClick = onToggleWatch) { Text(if (watchSelected) "Watching" else "Watch") } }
+            if (selected) { OutlinedButton(onClick = onToggle) {Text("Remove")} }
             else { Button(onClick = onToggle, enabled = canAdd) { Text("Add") } }
         }
     }

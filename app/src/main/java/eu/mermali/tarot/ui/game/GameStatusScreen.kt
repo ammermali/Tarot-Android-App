@@ -35,6 +35,7 @@ import eu.mermali.tarot.domain.gamerules.RejectionRule
 import eu.mermali.tarot.domain.model.GamePhase
 import eu.mermali.tarot.domain.model.Mission
 import eu.mermali.tarot.domain.model.MissionResult
+import eu.mermali.tarot.domain.model.MissionToken
 import eu.mermali.tarot.domain.model.Player
 import eu.mermali.tarot.game.gamestate.GameState
 import eu.mermali.tarot.ui.cards.TarotCardArt
@@ -114,6 +115,7 @@ private fun QuestCard(questNumber: Int, mission: Mission?, modifier: Modifier = 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = if (result == MissionResult.PENDING) Arrangement.SpaceBetween else Arrangement.Center
         ) {
+            HermitTokenBadges(tokens = mission?.tokens.orEmpty())
             if (result == MissionResult.PENDING) {
                 Text(
                     text = "Quest $questNumber",
@@ -271,6 +273,49 @@ private fun MissionResult.questColor(): Color {
         MissionResult.STRAIGHT -> StraightQuestColor
         MissionResult.REVERSED -> ReversedQuestColor
         MissionResult.PENDING -> MaterialTheme.colorScheme.primary
+    }
+}
+
+@Composable
+private fun HermitTokenBadges(tokens: Set<MissionToken>) {
+    if (tokens.isEmpty()) return
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+    ) {
+        tokens.forEach { token ->
+            HermitTokenBadge(token)
+        }
+    }
+
+    Spacer(Modifier.height(6.dp))
+}
+
+@Composable
+private fun HermitTokenBadge(token: MissionToken) {
+    val label = when (token) {
+        MissionToken.STRAIGHT_HERMIT -> "HS"
+        MissionToken.REVERSED_HERMIT -> "HR"
+    }
+
+    val color = when (token) {
+        MissionToken.STRAIGHT_HERMIT -> StraightQuestColor
+        MissionToken.REVERSED_HERMIT -> ReversedQuestColor
+    }
+
+    Surface(
+        shape = RoundedCornerShape(999.dp),
+        color = color.copy(alpha = 0.14f),
+        border = BorderStroke(1.dp, color)
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
     }
 }
 

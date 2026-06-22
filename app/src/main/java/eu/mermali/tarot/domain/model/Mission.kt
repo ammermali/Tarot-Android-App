@@ -9,6 +9,8 @@ data class Mission(
     val straightVoteCount: Int = 0,
     val reversedVoteCount: Int = 0,
     val magicVoteCount: Int = 0,
+    val tokens: Set<MissionToken> = emptySet(),
+    val watchTokenPlayerId: Int? = null,
     val artKey: String? = null
 ) {
     val isResolved: Boolean get() = result != MissionResult.PENDING

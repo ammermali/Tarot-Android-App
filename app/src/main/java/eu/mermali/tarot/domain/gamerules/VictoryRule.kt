@@ -1,22 +1,40 @@
 package eu.mermali.tarot.domain.gamerules
 import eu.mermali.tarot.domain.model.CardDirection
 import eu.mermali.tarot.domain.model.GamePhase
+import eu.mermali.tarot.domain.model.MissionResult
+import eu.mermali.tarot.domain.model.MissionToken
 import eu.mermali.tarot.domain.model.TarotAbility
 import eu.mermali.tarot.game.gamestate.GameState
 import eu.mermali.tarot.game.gamestate.VictoryReason
 import eu.mermali.tarot.game.gamestate.Winner
 
 class VictoryRule {
-    fun evaluate(state: GameState): Winner? = when {
-        state.reversedScore >= MISSIONS_TO_WIN -> Winner(side = CardDirection.REVERSED, reason = VictoryReason.THREE_REVERSED_MISSIONS)
-        state.consecutiveRejectedTeams >= RejectionRule.MAX_CONSECUTIVE_REJECTED_TEAMS -> Winner(side = CardDirection.REVERSED, reason = VictoryReason.FIVE_REJECTED_TEAMS)
-        state.straightScore >= MISSIONS_TO_WIN && !canRunFinalElimination(state) -> Winner(side = CardDirection.STRAIGHT, reason = VictoryReason.THREE_STRAIGHT_MISSIONS)
-        else -> null
+    fun evaluate(state: GameState): Winner? {
+        evaluateHermitVictory(state)?.let { return it }
+        return when {
+            state.reversedScore >= MISSIONS_TO_WIN -> Winner(
+                side = CardDirection.REVERSED,
+                reason = VictoryReason.THREE_REVERSED_MISSIONS
+            )
+            state.consecutiveRejectedTeams >= RejectionRule.MAX_CONSECUTIVE_REJECTED_TEAMS -> Winner(
+                side = CardDirection.REVERSED,
+                reason = VictoryReason.FIVE_REJECTED_TEAMS
+            )
+            state.straightScore >= MISSIONS_TO_WIN && !canRunFinalElimination(state) -> Winner(
+                side = CardDirection.STRAIGHT,
+                reason = VictoryReason.THREE_STRAIGHT_MISSIONS
+            )
+            else -> null
+        }
     }
 
     fun applyAfterMission(state: GameState): GameState {
         val winner = evaluate(state)
         if (winner != null) {return state.copy(winner = winner, phase = GamePhase.GAME_OVER) }
+        val hermitWinner = evaluateHermitVictory(state)
+        if (hermitWinner != null){
+            return state.copy(winner = hermitWinner, phase = GamePhase.GAME_OVER)
+        }
         if (state.straightScore >= MISSIONS_TO_WIN && canRunFinalElimination(state)) {
             return if (hasStraightDevil(state) && hasReversedDeath(state)){
                 state.copy(phase = GamePhase.DEVIL_GUESS)
@@ -45,6 +63,24 @@ class VictoryRule {
 
     private fun hasStraightDevil(state: GameState): Boolean = state.players.any { it.card?.id == "straight_devil" }
     private fun hasReversedDeath(state: GameState): Boolean = state.players.any { it.card?.id == "reversed_death" }
+
+    private fun evaluateHermitVictory(state: GameState): Winner? {
+        val currentMission = state.currentMission ?: return null
+        val straightHermitPlayer = state.players.firstOrNull { it.card?.hasAbility(TarotAbility.HermitStraight) == true }
+        val reversedHermitPlayer = state.players.firstOrNull { it.card?.hasAbility(TarotAbility.HermitReversed) == true }
+        val previousMissions = state.missions.filter { it.index < currentMission.index }
+        val currentHasStraightHermitToken = MissionToken.STRAIGHT_HERMIT in currentMission.tokens
+        val previousHasStraightHermitToken = previousMissions.any { MissionToken.STRAIGHT_HERMIT in it.tokens }
+        if(state.straightScore >= MISSIONS_TO_WIN && currentMission.result == MissionResult.STRAIGHT && currentHasStraightHermitToken && previousHasStraightHermitToken){
+            return Winner(side = CardDirection.STRAIGHT, reason=VictoryReason.HERMIT_STRAIGHT_TOKEN_WIN, winningPlayerId = straightHermitPlayer?.id)
+        }
+        val currentHasReversedToken = MissionToken.REVERSED_HERMIT in currentMission.tokens
+        val previousHasReversedToken = previousMissions.any { MissionToken.REVERSED_HERMIT in it.tokens }
+        if(state.reversedScore >= MISSIONS_TO_WIN && currentMission.result == MissionResult.REVERSED && currentHasReversedToken && previousHasReversedToken){
+            return Winner(side = CardDirection.REVERSED, reason=VictoryReason.HERMIT_REVERSED_TOKEN_WIN, winningPlayerId = straightHermitPlayer?.id)
+        }
+        return null
+    }
 
     companion object {
         const val MISSIONS_TO_WIN = 3

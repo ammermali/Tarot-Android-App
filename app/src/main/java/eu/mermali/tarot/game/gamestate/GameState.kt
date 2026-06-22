@@ -2,7 +2,7 @@ package eu.mermali.tarot.game.gamestate
 import eu.mermali.tarot.domain.model.GamePhase
 import eu.mermali.tarot.domain.model.Mission
 import eu.mermali.tarot.domain.model.MissionResult
-import eu.mermali.tarot.domain.model.MissionVote
+import eu.mermali.tarot.domain.model.MissionVoteCast
 import eu.mermali.tarot.domain.model.Player
 import eu.mermali.tarot.domain.model.TarotCard
 import eu.mermali.tarot.domain.model.TeamVote
@@ -17,7 +17,7 @@ data class GameState(
     val missions: List<Mission> = emptyList(),
     val proposedTeam: List<Player> = emptyList(),
     val teamVotes: Map<Int, TeamVote> = emptyMap(),
-    val missionVotes: List<MissionVote> = emptyList(),
+    val missionVotes: List<MissionVoteCast> = emptyList(),
     val devilGuessTargetPlayerId: Int? = null,
     val activeFinalEliminatorPlayerId: Int? = null,
     val winner: Winner? = null,

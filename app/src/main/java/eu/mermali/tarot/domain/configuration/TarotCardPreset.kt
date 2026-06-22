@@ -36,6 +36,14 @@ class TarotCardPreset {
             abilities = setOf(TarotAbility.AppearsReversed, TarotAbility.SeesFinalEliminator)
         ),
         TarotCard(
+            id = "straight_hermit",
+            displayName = "Straight Hermit",
+            direction = CardDirection.STRAIGHT,
+            abilities = setOf(TarotAbility.HermitStraight)
+        ),
+
+        // REVERSED CARDS
+        TarotCard(
             id = "reversed_death",
             displayName = "Reversed Death",
             direction = CardDirection.REVERSED,
@@ -70,6 +78,12 @@ class TarotCardPreset {
             displayName = "Reversed Magician",
             direction = CardDirection.REVERSED,
             abilities = setOf(TarotAbility.CanCastMagic)
+        ),
+        TarotCard(
+            id = "reversed_hermit",
+            displayName = "Reversed Hermit",
+            direction = CardDirection.REVERSED,
+            abilities = setOf(TarotAbility.HermitReversed, TarotAbility.IsolatedReversed, TarotAbility.HiddenFromSight)
         )
     )
 

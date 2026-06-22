@@ -143,8 +143,8 @@ fun TarotApp() {
                     TeamCreationScreen(
                         gameState = gameState,
                         onBack = { currentScreen = AppScreen.GAME_STATUS },
-                        onConfirmTeam = { selectedPlayerIds ->
-                            startedGameState = proposeTeam(gameState, selectedPlayerIds)
+                        onConfirmTeam = { selectedPlayerIds, watchTokenPlayerId ->
+                            startedGameState = proposeTeam(gameState, selectedPlayerIds, watchTokenPlayerId)
                             currentScreen = AppScreen.GAME_STATUS
                         }
                     )
