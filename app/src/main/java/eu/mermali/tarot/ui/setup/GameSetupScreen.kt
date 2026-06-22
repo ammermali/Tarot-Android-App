@@ -46,10 +46,16 @@ import eu.mermali.tarot.game.gamestate.GameState
 import eu.mermali.tarot.game.usecases.StartGame
 import eu.mermali.tarot.ui.cards.TarotCardArt
 import eu.mermali.tarot.ui.cards.TarotCardImageResolver
+import eu.mermali.tarot.ui.cards.TarotSkinCatalog
 
 private data class SetupPlayer(val name: String)
 
-private data class SetupState(val playerCount: Int, val players: List<SetupPlayer>, val deck: List<TarotCard>)
+private data class SetupState(
+    val playerCount: Int,
+    val players: List<SetupPlayer>,
+    val deck: List<TarotCard>,
+    val selectedSkinId: String = TarotSkinCatalog.DefaultSkinId
+)
 
 private data class SelectedRoleDetails(val card: TarotCard, val roleDescription: RoleDescription)
 
@@ -86,6 +92,7 @@ fun GameSetupScreen(onBack: () -> Unit, onStartGame: (GameState) -> Unit) {
         RoleDescriptionDialog(
             card = selectedRole.card,
             roleDescription = selectedRole.roleDescription,
+            skinId = setupState.selectedSkinId,
             onDismiss = { selectedRoleDetails = null }
         )
     }
@@ -99,7 +106,14 @@ fun GameSetupScreen(onBack: () -> Unit, onStartGame: (GameState) -> Unit) {
             PlayerCountSection(
                 selectedPlayerCount = setupState.playerCount,
                 supportedPlayerCounts = supportedPlayerCounts,
-                onPlayerCountSelected = { playerCount -> setupState = createSetupState(playerCount = playerCount, cardPreset = cardPreset, existingPlayers = setupState.players)}
+                onPlayerCountSelected = { playerCount -> setupState = createSetupState(playerCount = playerCount, cardPreset = cardPreset, existingPlayers = setupState.players, selectedSkinId = setupState.selectedSkinId)}
+            )
+
+            CardSkinSelection(
+                selectedSkinId = setupState.selectedSkinId,
+                onSkinSelected = {
+                    skinId -> setupState = setupState.copy(selectedSkinId = skinId)
+                }
             )
 
             PlayerOrderSection(
@@ -394,9 +408,9 @@ private fun FaceCardCounterRow(roleDescription: RoleDescription, count: Int, can
 }
 
 @Composable
-private fun RoleDescriptionDialog(card: TarotCard, roleDescription: RoleDescription, onDismiss: () -> Unit) {
+private fun RoleDescriptionDialog(card: TarotCard, roleDescription: RoleDescription, skinId: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val imageAssetPath = remember(context, card) { TarotCardImageResolver.roleCardAssetPath(card) }
+    val imageAssetPath = remember(context, card, skinId) { TarotCardImageResolver.roleCardAssetPath(card, skinId = skinId)}
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -411,10 +425,68 @@ private fun RoleDescriptionDialog(card: TarotCard, roleDescription: RoleDescript
     )
 }
 
-private fun createSetupState(playerCount: Int, cardPreset: TarotCardPreset, existingPlayers: List<SetupPlayer> = emptyList()): SetupState {
-    val players = List(playerCount) { index -> SetupPlayer(name = existingPlayers.getOrNull(index)?.name ?: "Player ${index + 1}") }
+@Composable
+private fun CardSkinSelection(selectedSkinId: String, onSkinSelected: (String) -> Unit){
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedSkinName = TarotSkinCatalog.displayNameFor(selectedSkinId)
+    SetupSection(title = "Card skin"){
+        Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)){
+            TarotCardArt(assetPath = TarotCardImageResolver.cardBackAssetPath(selectedSkinId), contentDescription = "$selectedSkinName card back", modifier = Modifier.width(52.dp), fallbackLabel = "?")
+            Column(modifier= Modifier.weight(1f)){
+                Text(
+                    text = selectedSkinName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text= "Choose the visual deck used for role, reading and card back images.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            OutlinedButton(onClick = { showDialog = true}) {Text("Change")}
+        }
+    }
+    if(showDialog){
+        AlertDialog(
+            onDismissRequest = {showDialog = false},
+            title = {Text("Choose card skin")},
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)){
+                    TarotSkinCatalog.availableSkins.forEach {
+                        skin ->
+                        val selected = skin.id == selectedSkinId
+                        if(selected){
+                            Button(onClick = {
+                                                onSkinSelected(skin.id)
+                                                showDialog=false
+                                             },
+                                modifier=Modifier.fillMaxWidth())
+                            { Text(skin.displayName) }
+                        } else {
+                            OutlinedButton(
+                                onClick = {
+                                    onSkinSelected(skin.id)
+                                    showDialog = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {Text(skin.displayName)}
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {showDialog = false}){
+                    Text("Close")
+                }
+            }
+        )
+    }
+}
 
-    return SetupState(playerCount = playerCount, players = players, deck = cardPreset.defaultSelection(playerCount))
+private fun createSetupState(playerCount: Int, cardPreset: TarotCardPreset, existingPlayers: List<SetupPlayer> = emptyList(), selectedSkinId: String = TarotSkinCatalog.DefaultSkinId): SetupState {
+    val players = List(playerCount) { index -> SetupPlayer(name = existingPlayers.getOrNull(index)?.name ?: "Player ${index + 1}") }
+    return SetupState(playerCount = playerCount, players = players, deck = cardPreset.defaultSelection(playerCount), selectedSkinId = selectedSkinId)
 }
 
 private fun SetupState.renamePlayer(index: Int, name: String): SetupState {
@@ -445,7 +517,7 @@ private fun SetupState.removeCard(card: TarotCard): SetupState {
 private fun SetupState.toGameState(): GameState {
     val gamePlayers = players.mapIndexed { index, player -> Player(id = index + 1, name = player.name.trim().ifBlank { "Player ${index + 1}" }, position = index)}
 
-    return GameState(players = gamePlayers, selectedCards = deck, phase = GamePhase.CARD_SETUP)
+    return GameState(players = gamePlayers, selectedCards = deck, cardSkinId = selectedSkinId,  phase = GamePhase.CARD_SETUP)
 }
 
 private fun SetupState.validate(cardValidator: TarotCardValidator, playerCountConfig: PlayerCountConfig): TarotCardValidationResult {

@@ -4,7 +4,7 @@ import eu.mermali.tarot.domain.model.MissionResult
 import eu.mermali.tarot.domain.model.TarotCard
 
 object TarotCardImageResolver {
-    fun artKeyAssetPath(artKey: String, skinId: String = DefaultSkinId): String? {
+    fun artKeyAssetPath(artKey: String, skinId: String = TarotSkinCatalog.DefaultSkinId): String? {
         return when {
             artKey.startsWith("basic_") -> artKey.cardAssetPath(CardKind.BASIC, skinId)
             artKey.startsWith("reading_") -> artKey.cardAssetPath(CardKind.READING, skinId)
@@ -14,15 +14,14 @@ object TarotCardImageResolver {
 
     fun cardBackAssetPath(skinId: String = DefaultSkinId): String {return "$skinRoot/$skinId/card_backs.png"}
 
-    fun roleCardAssetPath(card: TarotCard, seed: Int = card.id.hashCode()): String? {
-        card.artKey?.let { artKey -> artKeyAssetPath(artKey)?.let { return it } }
-    // TODO check
+    fun roleCardAssetPath(card: TarotCard, seed: Int = card.id.hashCode(), skinId: String = TarotSkinCatalog.DefaultSkinId): String? {
+        card.artKey?.let { artKey -> artKeyAssetPath(artKey, skinId)?.let { return it } }
         return when {
             card.id.startsWith(StraightFaceCardPrefix) -> StraightFaceCardPreview
             card.id.startsWith(ReversedFaceCardPrefix) -> ReversedFaceCardPreview
-            card.id == HermitCardId -> "$skinRoot/$DefaultSkinId/rolecards/reversed/hermit.png"
-            card.id.startsWith("straight_") -> card.id.roleAssetPath(CardDirection.STRAIGHT)
-            card.id.startsWith("reversed_") -> card.id.roleAssetPath(CardDirection.REVERSED)
+            card.id == HermitCardId -> "$skinRoot/$skinId/rolecards/reversed/hermit.png" // TODO remove it
+            card.id.startsWith("straight_") -> card.id.roleAssetPath(CardDirection.STRAIGHT, skinId)
+            card.id.startsWith("reversed_") -> card.id.roleAssetPath(CardDirection.REVERSED, skinId)
             else -> null
         }
     }

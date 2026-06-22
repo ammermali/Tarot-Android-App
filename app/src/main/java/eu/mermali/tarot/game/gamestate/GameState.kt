@@ -23,6 +23,7 @@ data class GameState(
     val winner: Winner? = null,
     val finalEliminationTargetPlayerId: Int? = null,
     val currentRevealPosition: Int = 0,
+    val cardSkinId: String = "default",
     val gameLog: List<String> = emptyList()
 ) {
     val currentMission: Mission?

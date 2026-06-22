@@ -51,7 +51,7 @@ fun GameStatusScreen(gameState: GameState, onCreateTeam: () -> Unit, onVoteTeam:
             ) {
                 Row(modifier = Modifier.fillMaxWidth(0.92f), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-                        QuestRow(missions = gameState.missions)
+                        QuestRow(missions = gameState.missions, skinId = gameState.cardSkinId)
                         Spacer(Modifier.height(16.dp))
                         RejectVictoryIndicator(rejectedTeams = gameState.consecutiveRejectedTeams)
                     }
@@ -83,22 +83,22 @@ private fun LandscapeFrame(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun QuestRow(missions: List<Mission>) {
+private fun QuestRow(missions: List<Mission>, skinId: String) {
     val missionSlots = (1..QuestCount).map { questIndex -> missions.firstOrNull { it.index == questIndex }}
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
         missionSlots.forEachIndexed { index, mission ->
-            QuestCard(questNumber = index + 1, mission = mission, modifier = Modifier.weight(1f))
+            QuestCard(questNumber = index + 1, mission = mission, skinId=skinId, modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun QuestCard(questNumber: Int, mission: Mission?, modifier: Modifier = Modifier) {
+private fun QuestCard(questNumber: Int, mission: Mission?, skinId: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val result = mission?.result ?: MissionResult.PENDING
     val resultColor = result.questColor()
-    val imageAssetPath = rememberQuestImageAssetPath(result = result, mission = mission, context = context)
+    val imageAssetPath = rememberQuestImageAssetPath(result = result, mission = mission, skinId=skinId, context = context)
     val borderColor = if (result == MissionResult.PENDING) MaterialTheme.colorScheme.outlineVariant else resultColor
     val cardColor = if (result == MissionResult.PENDING) { MaterialTheme.colorScheme.surface } else { resultColor.copy(alpha = 0.14f) }
 
@@ -245,13 +245,13 @@ private fun ReaderPanel(reader: Player?, team: List<Player>, phase: GamePhase, o
 }
 
 @Composable
-private fun rememberQuestImageAssetPath(result: MissionResult, mission: Mission?, context: android.content.Context): String? {
+private fun rememberQuestImageAssetPath(result: MissionResult, mission: Mission?, skinId: String, context: android.content.Context): String? {
     val seed = (mission?.index ?: 0) * 31 +
         (mission?.straightVoteCount ?: 0) * 7 +
         (mission?.reversedVoteCount ?: 0) * 13
-    return androidx.compose.runtime.remember(context, result, seed, mission?.artKey) {
-        if (result == MissionResult.PENDING) { TarotCardImageResolver.cardBackAssetPath() }
-        else { mission?.artKey?.let { TarotCardImageResolver.artKeyAssetPath(it) } ?: TarotCardImageResolver.readingCardAssetPath(result, seed)}
+    return androidx.compose.runtime.remember(context, result, seed, mission?.artKey, skinId) {
+        if (result == MissionResult.PENDING) { TarotCardImageResolver.cardBackAssetPath(skinId) }
+        else { mission?.artKey?.let { TarotCardImageResolver.artKeyAssetPath(it, skinId) } ?: TarotCardImageResolver.readingCardAssetPath(result, seed, skinId)}
     }
 }
 

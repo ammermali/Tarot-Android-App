@@ -65,6 +65,7 @@ fun RoleRevealScreen(gameState: GameState, onComplete: () -> Unit, onBack: () ->
                     player = currentPlayer,
                     players = players,
                     visibleInformation = visibleInformationByPlayer[currentPlayer.id].orEmpty(),
+                    skinId = gameState.cardSkinId,
                     isLastPlayer = revealState.currentPlayerIndex == players.lastIndex,
                     onNext = {
                         if (revealState.currentPlayerIndex == players.lastIndex) { onComplete() }
@@ -119,7 +120,7 @@ private fun PassPhoneContent(player: Player, onReveal: () -> Unit) {
 }
 
 @Composable
-private fun RoleContent(player: Player, players: List<Player>, visibleInformation: List<InitialVisibility>, isLastPlayer: Boolean, onNext: () -> Unit) {
+private fun RoleContent(player: Player, players: List<Player>, visibleInformation: List<InitialVisibility>, skinId: String, isLastPlayer: Boolean, onNext: () -> Unit) {
     val card = player.card
 
     Column(
@@ -136,7 +137,7 @@ private fun RoleContent(player: Player, players: List<Player>, visibleInformatio
 
         if (card == null) { Text("No role assigned", color = MaterialTheme.colorScheme.error) }
         else {
-            RoleCard(card = card, seed = player.id)
+            RoleCard(card = card, seed = player.id, skinId = skinId)
             Spacer(Modifier.height(16.dp))
             VisibilityCard(visibleInformation = visibleInformation, players = players)
         }
@@ -147,14 +148,14 @@ private fun RoleContent(player: Player, players: List<Player>, visibleInformatio
 }
 
 @Composable
-private fun RoleCard(card: TarotCard) {
-    RoleCard(card = card, seed = card.id.hashCode())
+private fun RoleCard(card: TarotCard, skinId: String) {
+    RoleCard(card = card, seed = card.id.hashCode(), skinId)
 }
 
 @Composable
-private fun RoleCard(card: TarotCard, seed: Int) {
+private fun RoleCard(card: TarotCard, seed: Int, skinId: String) {
     val context = LocalContext.current
-    val imageAssetPath = remember(context, card, seed) { TarotCardImageResolver.roleCardAssetPath(card, seed) }
+    val imageAssetPath = remember(context, card, seed, skinId) { TarotCardImageResolver.roleCardAssetPath(card, seed, skinId = skinId) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
